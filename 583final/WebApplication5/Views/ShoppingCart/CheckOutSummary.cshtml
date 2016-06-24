@@ -1,0 +1,123 @@
+﻿@using ExtensionHelpers
+@model WebApplication5.Models.Product
+@{
+    ViewBag.Title = "CheckOutSummary";
+}
+
+<h2>CheckOutSummary</h2>
+
+
+
+
+<div id="ShoppingCartInformation">
+
+</div>
+<div id="CheckOutSummary">
+
+</div>
+@section Scripts
+{
+
+
+    <script type="text/javascript">
+
+    var currentUser = {};
+    var membership = "membership";
+    var userId = "userId";
+    var taxRate = "";
+    var fianlTotal = 0;
+    var discountRate = "";
+    var finalBill = 0;
+
+
+
+    $(document).ready(function () {
+
+
+
+        getCurrrentUserRole();
+
+
+    });
+
+    function getCurrrentUserRole() {
+        $.getJSON("/api/Role/", function (data) {
+            console.log(data);
+            $.each(data, function (i, cUser) {
+                console.log(cUser);
+                console.log(cUser.Role);
+                currentUser[membership] = cUser.Role;
+                currentUser[userId] = cUser.UserId;
+            });
+            loadShoppingCartItem(currentUser[userId]);
+
+        });
+
+    }
+
+    function loadShoppingCartItem(userId) {
+
+    $("#ShoppingCartInformation").empty();
+                $.ajax({
+                    url: '/api/ShoppingCart?userId=' + userId,
+                    type: 'GET',
+                    success: function (data) {
+                        $.each(data, function (i, shoppingCartItem) {
+                            $("#ShoppingCartInformation").append("<div id='" + shoppingCartItem.productId + "' class='panel panel-default'><div class='panel-heading'><h3 class='panel-title' > Product Name : " + shoppingCartItem.Name + "</h3></div><div class='panel-body'>Product Description : " + shoppingCartItem.Description + "</div>"
+                                  + "<div class='panel-body'>Product Price $: " + shoppingCartItem.UnitPrice + "</div>" + "<div class='panel-body'>Product Category : " + shoppingCartItem.Category + "</div><div class='panel-body'>Membership Visibility : " + shoppingCartItem.MembershipVisibleCategory + "</div><div class='panel-body' id='ItemQuantity'>Quantity: " + shoppingCartItem.numbers + "</div><div class='panel-body' ></div></div>");
+                            $("#" + shoppingCartItem.productId + " div:nth-child(7)").append("<span style='float:right;'>Item Total $ :" + shoppingCartItem.numbers * shoppingCartItem.UnitPrice + "</span>");
+                            fianlTotal += shoppingCartItem.numbers * shoppingCartItem.UnitPrice;
+                        });
+                        if (currentUser[membership] == "RegularMember")
+                        {
+                            taxRate = "15%";
+                            discountRate = "0";
+                            finalBill = fianlTotal * 1.15;
+                            $("#CheckOutSummary").append("<div>Total Amount is: $" + fianlTotal + "</div>");
+                            $("#CheckOutSummary").append("<div id='discount'>Discount rate is: 0% due to regular membership</div>");
+                            $("#CheckOutSummary").append("<div>Discount is:" + fianlTotal * 0 + "</div>");
+                            $("#CheckOutSummary").append("<div>Tax rate is: 15% </div>");
+                            $("#CheckOutSummary").append("<div>Tax is: $" + fianlTotal * 0.15 + "</div>");
+                            $("#CheckOutSummary").append("<div>Final Bill is: $" + finalBill + "</div>");
+                            $("#discount").append("<div><a href='/Membership/ViewMembership'>Update Membership</a></div>");
+                        }
+                        else if (currentUser[membership] == "SilverMember")
+                        {
+                            taxRate = "15%";
+                            discountRate = "5%";
+                            finalBill = fianlTotal * 1.15*0.95;
+                            $("#CheckOutSummary").append("<div>Total Amount is: $" + fianlTotal + "</div>");
+                            $("#CheckOutSummary").append("<div id='discount'>Discount rate is: 5% due to silver membership</div>");
+                            $("#CheckOutSummary").append("<div>Discount is:" + fianlTotal * 0.05 + "</div>");
+                            $("#CheckOutSummary").append("<div>Tax rate is: 15% </div>");
+                            $("#CheckOutSummary").append("<div>Tax is: $" + fianlTotal *0.95*0.15 + "</div>");
+                            $("#CheckOutSummary").append("<div>Final Bill is: $" + finalBill + "</div>");
+                            $("#discount").append("<div><a href='/Membership/ViewMembership'>Update Membership</a></div>");
+                        }
+                        else if (currentUser[membership] == "GoldenMember") {
+                            taxRate = "15%";
+                            discountRate = "10%";
+                            finalBill = fianlTotal * 1.15 * 0.90;
+                            $("#CheckOutSummary").append("<div>Total Amount is: $" + fianlTotal + "</div>");
+                            $("#CheckOutSummary").append("<div id='discount'>Discount rate is: 10% due to golden membership</div>");
+                            $("#CheckOutSummary").append("<div>Discount is:" + fianlTotal * 0.10+ "</div>");
+                            $("#CheckOutSummary").append("<div>Tax rate is: 15% </div>");
+                            $("#CheckOutSummary").append("<div>Tax is: $" + fianlTotal * 0.90 * 0.15 + "</div>");
+                            $("#CheckOutSummary").append("<div>Final Bill is: $" + finalBill + "</div>");
+                            
+                           
+                        }
+                       
+                        $("#CheckOutSummary").append("<div><form id='paymet'action='/ShoppingCart/InitiateCreditTransaction' method='post'><p><input type='hidden' id='paymentId' name='paymentName' value='"+finalBill+"'></p><p><input type='submit' value='Pay'/> </p></form></div>");
+
+                    },
+                    error: function (result) {
+                        alert("Unable to load product.")
+                    }
+                });
+
+        }
+
+
+    </script>
+}

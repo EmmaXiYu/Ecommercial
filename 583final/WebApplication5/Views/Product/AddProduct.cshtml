@@ -1,0 +1,335 @@
+﻿@using ExtensionHelpers
+@model WebApplication5.Models.Product
+@{
+    ViewBag.Title = "AddProduct";
+}
+
+
+
+
+<h2>AddProduct</h2>
+
+
+
+
+
+
+<div id="MemberCategoryContainer">
+    <h4 class="modal-title">Choose Member Visibility Type</h4>
+    <Select id="MemberCategory" onchange="memberCategory_click();">
+        <option value="All">All</option>
+        <option value="RegularMember">Regular Member</option>
+        <option value="SilverMember">Silver Member</option>
+        <option value="GoldenMember">Golden Member</option>
+    </Select>`
+    <br>
+    <br>
+</div>
+<div id="CategoryContainer">
+    <h4 class="modal-title">Choose Product Type</h4>
+    <Select id="category" onchange="category_click();">
+        <option value="All">All</option>
+        <option value="Special Collection Wine">Special Collection Wine</option>
+        <option value="Ancient Wine">Ancient Wine</option>
+        <option value="Regular Wine">Regular Wine</option>
+    </Select>  
+    <br>
+    <br>
+</div>
+
+<h4>Product Information</h4>
+<div id="ProductsContainer">
+
+</div>
+
+<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#ProductModal">Add Product</button>
+
+<div id="ProductModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add New Product</h4>
+            </div>
+            <div class="modal-body">
+                @using (Ajax.BeginForm("", "api/Product/", new AjaxOptions { HttpMethod = "Post", OnSuccess = "$('#ProductModal').modal('hide');", OnFailure = "alert('An error occurred, please try again.');" }))
+                {
+
+                    <fieldset class="form-group">
+                        <label for="ProductName">Product Name</label>
+                        @Html.TextBoxFor(t => t.Name, new { @class = "form-control" })
+                    </fieldset>
+                        <fieldset class="form-group">
+                            <label for="ProductPrice">Product Price</label>
+                            @Html.TextBoxFor(t => t.UnitPrice, new { @class = "form-control" })
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <label for="ProductInventoryNumber">Product Inventory Quantity</label>
+                            @Html.TextBoxFor(t => t.InventoryNumbers, new { @class = "form-control" })
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <label for="ProductCategory">Product Type</label>
+                            @{
+                                var listCategory = new List<SelectListItem>()
+                        {
+                                    new SelectListItem { Text = "All" , Value ="All" },
+                        new SelectListItem { Text = "Special Collection Wine" , Value ="Special Collection Wine" },
+                        new SelectListItem { Text = "Ancient Wine", Value ="Ancient Wine"},
+                        new SelectListItem { Text ="Regular Wine", Value ="Regular Wine"},
+
+                    };
+                            }
+
+  @Html.DropDownListFor(m => m.Category, listCategory, new { @class = "form-control" })
+
+
+
+                        </fieldset>
+
+                        <fieldset class="form-group">
+                            <label for="ProductMemberVisibilityCategory">Product Member Visibility Type</label>
+                            @{
+                                var listMemberCategory = new List<SelectListItem>()
+                        {
+                                     new SelectListItem { Text = "All" , Value ="All" },
+                        new SelectListItem { Text = "Regular Member" , Value ="RegularMember" },
+                        new SelectListItem { Text = "Silver Member", Value ="SilverMember"},
+                        new SelectListItem { Text ="Golden Member", Value ="GoldenMember"},
+
+                    };
+                            }
+                            
+@Html.DropDownListFor(m => m.MembershipVisibleCategory, listMemberCategory, new { @class = "form-control" })
+                           
+                        
+                            
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <label for="ProductDescription">Product Information</label>
+                            @Html.TextAreaFor(t => t.Description, new { @class = "form-control" })
+                        </fieldset>
+
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="EditProductModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Edit Product</h4>
+            </div>
+            <div class="modal-body">
+                @using (Ajax.BeginForm("", "api/Product/", new AjaxOptions { HttpMethod = "Post", OnSuccess = "$('#EditProductModal').modal('hide');", OnFailure = "alert('An error occurred, please try again.');" }))
+                {
+
+                    <fieldset class="form-group">
+                        @Html.HiddenFor(t => t.Id)
+                        <label for="TipTitle">Product Title</label>
+                    </fieldset>
+                        <fieldset class="form-group">
+                            <label for="ProductName">Product Name</label>
+                            @Html.TextBoxFor(t => t.Name, new { @class = "form-control" })
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <label for="ProductPrice">Product Price</label>
+                            @Html.TextBoxFor(t => t.UnitPrice, new { @class = "form-control" })
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <label for="ProductInventoryNumber">Product Inventory Quantity</label>
+                            @Html.TextBoxFor(t => t.InventoryNumbers, new { @class = "form-control" })
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <label for="ProductCategory">Product Type</label>
+                            @{
+                                var listCategory = new List<SelectListItem>()
+                        {
+                        new SelectListItem { Text = "Special Collection Wine" , Value ="Special Collection Wine" },
+                        new SelectListItem { Text = "Ancient Wine", Value ="Ancient Wine"},
+                        new SelectListItem { Text ="Regular Wine", Value ="Regular Wine"},
+
+                    };
+                            }
+
+                            @Html.DropDownListFor(m => m.Category, listCategory, new { @class = "form-control" })
+
+
+
+                        </fieldset>
+
+                        <fieldset class="form-group">
+                            <label for="ProductMemberVisibilityCategory">Product Member Visibility Type</label>
+                            @{
+                                var listMemberCategory = new List<SelectListItem>()
+                        {
+                        new SelectListItem { Text = "Regular Member" , Value ="RegularMember" },
+                        new SelectListItem { Text = "Silver Member", Value ="SilverMember"},
+                        new SelectListItem { Text ="Golden Member", Value ="GoldenMember"},
+
+                    };
+                            }
+
+                            @Html.DropDownListFor(m => m.MembershipVisibleCategory, listMemberCategory, new { @class = "form-control" })
+
+
+
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <label for="ProductDescription">Product Information</label>
+                            @Html.TextAreaFor(t => t.Description, new { @class = "form-control" })
+                        </fieldset>
+
+                        <button type="submit" class="btn btn-primary">Update</button>
+                                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+                                
+
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var pc;
+        var mc;
+       
+        $(document).ready(function () {
+            //Load Tips when the page is loaded
+           // LoadCategory();
+           // var myVar = category_click();
+            // loadProducts(pc,pm);       mc = document.getElementById("MemberCategory").value;
+            pc = document.getElementById('category').value;
+            mc = document.getElementById('MemberCategory').value;
+            loadProducts(pc, mc);
+
+
+
+
+            //Add a function to reload the list when the dialog closes
+            $('#ProductModal').on('hidden.bs.modal', function () {
+                loadProducts(pc, mc);
+
+
+            })
+
+            $('#EditProductModal').on('hidden.bs.modal', function () {
+                loadProducts(pc, mc);
+
+            })
+        });
+
+        function category_click() {
+             mc = document.getElementById('MemberCategory').value;
+             pc = document.getElementById('category').value;
+             loadProducts(pc, mc);
+        }
+        function memberCategory_click() {
+            mc = document.getElementById('MemberCategory').value;
+            pc = document.getElementById('category').value;
+            loadProducts(pc, mc);
+        }
+        //Make an ajax call to load the tips
+       /* function LoadCategory() {
+            $("#category").empty();
+           $("#category").append("<option value='Select A Category'>Select A Category</option>");
+            var listItems = "";
+            //$("#CategoryContainer").empty();
+            $.getJSON("/api/Category/", function (data) {
+
+                $.each(data, function (i, stringValue) {
+                    listItems+="<option value='" + stringValue + "'>" + stringValue + "</option>";
+
+                });
+                $("#category").append(listItems);
+
+            });
+
+
+        }*/
+   //Make an ajax call to load the tips
+
+
+        function loadProducts(category, memberCategory) {
+         
+                $("#ProductsContainer").empty();
+                $.ajax({
+                    url: '/api/Product?category=' + category + '&MemberCategory=' + memberCategory,
+                    type: 'GET',
+                    success: function (data) {
+                        $.each(data, function (i, product) {
+                            $("#ProductsContainer").append("<div id='" + product.Id + "' class='panel panel-default'><div class='panel-heading'><h3 class='panel-title' > Product Name : " + product.Name + "</h3></div><div class='panel-body'>Product Description : " + product.Description + "</div>"
+                                + "<div class='panel-body'>Product Price : " + product.UnitPrice + "</div>" +
+                                "<div class='panel-body'>Product Category : " + product.Category +
+                                "</div><div class='panel-body'>Membership Visibility : " + product.MembershipVisibleCategory + "</div><div class='panel-body'>Product Inventory Numbers : "
+                                + product.InventoryNumbers + "</div></div>");
+
+                            if (product.IsEditable) {
+                                $("#" + product.Id + " div:nth-child(4)").append("<span style='float:right;'><a class='btn btn-danger' href='javascript:deleteProduct(" + product.Id + ");'> Delete</a></span>");
+
+                                $("#" + product.Id + " div:nth-child(4)").append("<span style='float:right;'><a class='btn btn-success' href='javascript:editProduct(" + product.Id + ");'> Edit</a></span>");
+                            }
+
+                        });
+
+                    },
+                    error: function (result) {
+                        alert("Unable to load product.")
+                    }
+                });
+            
+        }
+
+        //Make an ajax call to delete a tip
+        function deleteProduct(id) {
+            $.ajax({
+                url: '/api/Product/' + id,
+                type: 'DELETE',
+                success: function (result) {
+                    loadProducts(pc, mc);
+
+                },
+                error: function (result) {
+                    alert("Unable to delete tip.")
+                }
+            });
+        }
+
+        function editProduct(id) {
+
+            $.ajax({
+                url: '/api/Product/' + id,
+                type: 'GET',
+
+                success: function (result) {
+                    alert(result.Name);
+                    $('#EditProductModal').find('#Id').val(result.Id);
+                    $('#EditProductModal').find('#Name').val(result.Name);
+                    $('#EditProductModal').find('#Description').val(result.Description);
+                    $('#EditProductModal').find('#UnitPrice').val(result.UnitPrice);
+                    $('#EditProductModal').find('#Category').val(result.Category);
+                    $('#EditProductModal').find('#InventoryNumbers').val(result.InventoryNumbers);
+                    $('#EditProductModal').modal('show');
+
+                },
+                error: function (result) {
+                    alert("Unable to load tip.")
+                }
+            });
+        }
+
+    </script>
+}

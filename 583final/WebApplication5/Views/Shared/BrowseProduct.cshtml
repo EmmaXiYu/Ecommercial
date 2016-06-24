@@ -1,0 +1,105 @@
+﻿@using ExtensionHelpers
+@model WebApplication5.Models.Product
+<div id="CategoryContainer">
+    <h4 class="modal-title">Choose Product Type</h4>
+    <Select id="category" onchange="category_click();">
+        <option value="All">All</option>
+        <option value="Special Collection Wine">Special Collection Wine</option>
+        <option value="Ancient Wine">Ancient Wine</option>
+        <option value="Regular Wine">Regular Wine</option>
+    </Select>
+    <br>
+    <br>
+</div>
+
+<h4>Product Information</h4>
+<div id="ProductsContainer">
+
+</div>
+
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var pc="";
+
+        var currentUser = {};
+        var membership = "membership";
+        var userId = "userId";
+
+
+        $(document).ready(function () {
+
+
+           pc = document.getElementById('category').value;
+           getCurrrentUserRole();
+
+
+        });
+
+        function category_click() {
+
+             pc = document.getElementById('category').value;
+
+
+           getCurrrentUserRole();
+
+        }
+
+        function addToShoppingCart(productId) {
+
+            $.ajax({
+                url: '/api/ShoppingCart/?productId=' + productId + "&currentUserId=" + currentUser[userId],
+                type: 'POST',
+
+                success: function (result) {
+                   alert("Add to shopping cart.")
+                },
+                error: function (result) {
+                    alert("Unable to add to shopping cart.")
+                }
+            });
+        }
+        function getCurrrentUserRole() {
+            $.getJSON("/api/Role/", function (data) {
+                console.log(data);
+                $.each(data, function (i, cUser) {
+                    console.log(cUser);
+                    console.log(cUser.Role);
+                    currentUser[membership] = cUser.Role;
+                    currentUser[userId] = cUser.UserId;
+                });
+                loadProducts(pc, currentUser[membership]);
+
+            });
+
+        }
+
+         function loadProducts(category, memberCategory) {
+
+             $("#ProductsContainer").empty();
+             $.ajax({
+                 url: '/api/Product?category=' + category + '&MemberCategory=' + memberCategory,
+                 type: 'GET',
+                 success: function (data) {
+                     $.each(data, function (i, product) {
+                         $("#ProductsContainer").append("<div id='" + product.Id + "' class='panel panel-default'><div class='panel-heading'><h3 class='panel-title' > Product Name : " + product.Name + "</h3></div><div class='panel-body'>Product Description : " + product.Description + "</div>"
+                             + "<div class='panel-body'>Product Price : " + product.UnitPrice + "</div>" + "<div class='panel-body'>Product Category : " + product.Category + "</div></div>");
+                         if (memberCategory != "Admin") {
+                             $("#" + product.Id + " div:nth-child(4)").append("<span style='float:right;'><a class='btn btn-danger' href='javascript:addToShoppingCart(" + product.Id + ");'> Add to Shopping Cart</a></span>");
+                         }
+
+                     });
+
+                 },
+                 error: function (result) {
+                     alert("Unable to load product.")
+                 }
+             });
+
+         }
+
+
+    </script>
+}
+

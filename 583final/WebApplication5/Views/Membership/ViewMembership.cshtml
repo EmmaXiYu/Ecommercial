@@ -1,0 +1,80 @@
+﻿
+@{
+    ViewBag.Title = "ViewMembership";
+}
+
+<h2>ViewMembership</h2>
+<div id="currentMembership"></div>
+
+<div id="changeMembership">
+    <h4>Choose the membership you want to upgrade.</h4>
+    <form action="/Membership/InitiateCreditTransaction" method="post">
+
+        <fieldset>
+           <select id="membershipOptions" name="membershipOptions" onchange="memberUpgrade_click();" >
+            <option value="Select a membership">Select a Membership</Option></select>
+
+            <p><input type="submit" value="Submit" /> </p>
+
+        </fieldset>
+
+    </form>
+    <div id="MembershipInformation"></div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+    
+
+
+        $(document).ready(function () {
+            
+
+            getCurrrentUserRole();
+        });
+
+            function getCurrrentUserRole() {
+                $.getJSON("/api/Role/", function (data) {
+                    console.log(data);
+                    $.each(data, function (i, cUser) {
+                        console.log(cUser);
+                        console.log(cUser.Role);
+                         
+                        $("#currentMembership").append("<div>You current Membership is "+cUser.Role+"</div>");
+                        if (cUser.Role == "RegularMember")
+                        {
+                            $("#membershipOptions").append("<option value='SilverMember'>Silver Member</option>");
+                            $("#membershipOptions").append("<option value='GoldenMember'>Golden Member</option>"); }
+                        else if (cUser.Role == "SilverMember")
+                        {
+                            $("#membershipOptions").append("<option value='GoldenMember'>Golden Member</option>");
+                        }
+                        else if (cUser.Role == "GoldenMember")
+                        { }
+
+                    });
+                });
+            }
+            function memberUpgrade_click() {
+                $("#MembershipInformation").empty();
+                mp = document.getElementById('membershipOptions').value;
+                
+                if (mp=="SilverMember")
+                {
+                    $("#MembershipInformation").append("<h4>Silver Membership charge $ 20.20.</h4><h4>The silver membership privilege is to view products" +
+                        " that is only visible for silver member.</h4><h4>And the silver member will get 5% discount and free shiiping of any order.</h4>" +
+                        "<h4>The tax is: $3.03.</h4><h4>The total charge will be $23.23.</h4>");
+                }
+                else if (mp == "GoldenMember")
+                {
+
+                    $("#MembershipInformation").append("<h4>Golden" +
+                        " Membership charge $ 30.20.</h4><h4>The silver membership privilege is to view products " +
+                        "that is only visible for golden member.</h4><h4>And the silver member will get 10% discount and free shiiping of any order.</h4>" +
+                        "<h4>The tax is: $4.53.</h4><h4>The total charge will be $34.73.</h4></div>");
+                }
+            }
+
+    </script>
+}

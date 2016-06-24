@@ -1,0 +1,132 @@
+﻿@using ExtensionHelpers
+@model WebApplication5.Models.Product
+@{
+    ViewBag.Title = "ManageShoppingCart";
+}
+
+<h2>ManageShoppingCart Information</h2>
+
+<div id="ShoppingCartInformation">
+
+</div>
+
+
+
+@section Scripts
+{
+    <script type="text/javascript">
+       
+
+        var currentUser = {};
+        var membership = "membership";
+        var userId = "userId";
+
+
+        $(document).ready(function () {
+
+
+           
+           getCurrrentUserRole();
+
+
+        });
+
+                  
+        
+        function getCurrrentUserRole() {
+            $.getJSON("/api/Role/", function (data) {
+                console.log(data);
+                $.each(data, function (i, cUser) {
+                    console.log(cUser);
+                    console.log(cUser.Role);
+                    currentUser[membership] = cUser.Role;
+                    currentUser[userId] = cUser.UserId;
+                });
+                loadShoppingCartItem(currentUser[userId]);
+
+            });
+
+        }
+
+        
+        
+         function loadShoppingCartItem(userId) {
+
+             $("#ShoppingCartInformation").empty();
+             $.ajax({
+                 url: '/api/ShoppingCart?userId=' + userId,
+                 type: 'GET',
+                 success: function (data) {
+                     $.each(data, function (i, shoppingCartItem) {
+                         if (shoppingCartItem != null && shoppingCartItem != undefined) {
+
+                             $("#ShoppingCartInformation").append("<div id='" + shoppingCartItem.productId + "' class='panel panel-default'><div class='panel-heading'><h3 class='panel-title' > Product Name : " + shoppingCartItem.Name + "</h3></div><div class='panel-body'>Product Description : " + shoppingCartItem.Description + "</div>"
+                                    + "<div class='panel-body'>Product Price : " + shoppingCartItem.UnitPrice + "</div>" + "<div class='panel-body'>Product Category : " + shoppingCartItem.Category + "</div><div class='panel-body'>Membership Visibility : " + shoppingCartItem.MembershipVisibleCategory + "</div><div class='panel-body' id='ItemQuantity'>Quantity: " + shoppingCartItem.numbers + "</div><div class='panel-body' id='ItemInventoryQuantity'>InventoryQuantity: " + shoppingCartItem.InventoryNumbers + "</div></div>");
+
+
+
+                             $("#" + shoppingCartItem.productId + " div:nth-child(6)").append("<span style='float:right;'><a class='btn btn-primary' href='javascript:increaseQuantity(" + shoppingCartItem.userId + ");'>+ </a></span>");
+                             $("#" + shoppingCartItem.productId + " div:nth-child(6)").append("<span style='float:right;'><a class='btn btn-primary' href='javascript:decreaseQuantity(" + shoppingCartItem.userId + ");'>-</a></span>");
+                             $("#" + shoppingCartItem.productId + " div:nth-child(6)").append("<span style='float:right;'><a class='btn btn-danger' href='javascript:deleteItem(" + shoppingCartItem.productId + ");'>Delete Item</a></span>");
+
+
+
+                         }
+
+                     });
+
+                 },
+                 error: function (result) {
+                     alert("Unable to load product.")
+                 }
+             });
+
+         }
+
+
+
+         function increaseQuantity(userId)
+         {
+             $.ajax({
+                 url: '/api/ShoppingCart/?productId=' + productId + "&currentUserId=" +userId+"&operation=plus",
+                 type: 'POST',
+
+                 success: function (result) {
+                    
+                    /// $('#ItemQuantity').html((num + 1));
+                 },
+                 error: function (result) {
+                     alert("Unable to add to shopping cart.")
+                 }
+             });
+            
+         }
+         function decreaseQuantity(userId)
+         {   // if(num>=0)
+             $.ajax({
+                 url: '/api/ShoppingCart/?productId=' + productId + "&currentUserId=" + userId + "&operation=minus",
+                 type: 'POST',
+
+                 success: function (result) {
+
+                   //  $('#ItemQuantity').html((num-1));
+                 },
+                 error: function (result) {
+                     alert("Unable to add to shopping cart.")
+                 }
+             });
+
+             
+         }
+         function deleteItem(productId)
+         {
+         }
+
+             // function getProductInventoryNum(id)
+             // {
+             // }
+
+    </script>
+}
+
+
